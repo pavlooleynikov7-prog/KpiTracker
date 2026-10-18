@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:KpiTracker.ViewModels"
+             xmlns:models="clr-namespace:KpiTracker.Models"
+             xmlns:helpers="clr-namespace:KpiTracker.Helpers"
+             x:Class="KpiTracker.Views.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="KPI відділу">
+
+    <ContentPage.Resources>
+        <helpers:KpiStatusToColorConverter x:Key="StatusToColor" />
+        <helpers:KpiStatusToTextConverter x:Key="StatusToText" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16" RowSpacing="12">
+
+        <!-- 1. Підсумки по відділу -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorder}" BackgroundColor="{StaticResource Primary}">
+            <Grid ColumnDefinitions="*,*,*">
+                <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
+                    <Label Text="{Binding TotalCount}" Style="{StaticResource SummaryValue}" />
+                    <Label Text="показників" Style="{StaticResource SummaryCaption}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                    <Label Text="{Binding AchievedCount}" Style="{StaticResource SummaryValue}" />
+                    <Label Text="виконано" Style="{StaticResource SummaryCaption}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                    <Label Text="{Binding AverageCompletion, StringFormat='{0}%'}" Style="{StaticResource SummaryValue}" />
+                    <Label Text="середнє" Style="{StaticResource SummaryCaption}" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- 2. Форма введення нового показника -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorder}">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Новий показник KPI" Style="{StaticResource SectionTitle}" />
+
+                <Entry Placeholder="Співробітник (ПІБ)"
+                       Text="{Binding EmployeeName}" />
+                <Entry Placeholder="Назва показника"
+                       Text="{Binding MetricName}" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Entry Grid.Column="0" Placeholder="План" Keyboard="Numeric"
+                           Text="{Binding TargetValueText}" />
+                    <Entry Grid.Column="1" Placeholder="Факт" Keyboard="Numeric"
+                           Text="{Binding ActualValueText}" />
+                </Grid>
+
+                <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}"
+                       TextColor="{StaticResource Danger}" FontSize="13" />
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Button Grid.Column="0" Text="Додати показник"
+                            Command="{Binding AddKpiCommand}" />
+                    <Button Grid.Column="1" Text="Очистити"
+                            Style="{StaticResource SecondaryButton}"
+                            Command="{Binding ClearFormCommand}" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- 3. Рядок стану: показує, що ViewModel змінилась -->
+        <Label Grid.Row="2" Text="{Binding StatusMessage}"
+               FontSize="13" TextColor="{StaticResource Gray600}" />
+
+        <!-- 4. Список показників -->
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Records}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="Показників ще немає" HorizontalOptions="Center"
+                       Margin="0,24" TextColor="{StaticResource Gray600}" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:KpiRecord">
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid ColumnDefinitions="6,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto"
+                              ColumnSpacing="10" RowSpacing="4">
+
+                            <BoxView Grid.RowSpan="4" WidthRequest="6" CornerRadius="3"
+                                     Color="{Binding Status, Converter={StaticResource StatusToColor}}" />
+
+                            <Label Grid.Column="1" Text="{Binding EmployeeName}"
+                                   FontAttributes="Bold" FontSize="16" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding MetricName}"
+                                   TextColor="{StaticResource Gray600}" />
+
+                            <Label Grid.Column="1" Grid.Row="2" FontSize="13">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Факт " />
+                                        <Span Text="{Binding ActualValue}" FontAttributes="Bold" />
+                                        <Span Text=" / план " />
+                                        <Span Text="{Binding TargetValue}" FontAttributes="Bold" />
+                                        <Span Text="  •  " />
+                                        <Span Text="{Binding Status, Converter={StaticResource StatusToText}}"
+                                              TextColor="{Binding Status, Converter={StaticResource StatusToColor}}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+
+                            <ProgressBar Grid.Column="1" Grid.Row="3" Progress="{Binding Progress}"
+                                         ProgressColor="{Binding Status, Converter={StaticResource StatusToColor}}" />
+
+                            <VerticalStackLayout Grid.Column="2" Grid.RowSpan="4" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding CompletionPercent, StringFormat='{0}%'}"
+                                       FontSize="20" FontAttributes="Bold" HorizontalOptions="End"
+                                       TextColor="{Binding Status, Converter={StaticResource StatusToColor}}" />
+                                <Button Text="Видалити" Style="{StaticResource LinkButton}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteKpiCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
