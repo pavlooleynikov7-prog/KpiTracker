@@ -3,7 +3,7 @@
 Лабораторна робота №1 з дисципліни «Технології розробки мобільних додатків на C#».
 Варіант 8: **Трекер виконання KPI співробітників відділу**.
 
-Кросплатформний застосунок на **.NET MAUI (.NET 8)**, побудований за патерном **MVVM**
+Кросплатформний застосунок на **.NET MAUI (.NET 10)**, побудований за патерном **MVVM**
 з використанням **CommunityToolkit.Mvvm**. Дані зберігаються в пам'яті
 (збереження в БД з'явиться в ЛР №3).
 
@@ -32,15 +32,15 @@ KpiTracker/
 
 ## Запуск
 
-Потрібно: .NET 8 SDK, робоче навантаження MAUI, Android SDK / емулятор.
+Потрібно: .NET 10 SDK, робоче навантаження MAUI, Android SDK / емулятор.
 
 ```bash
 dotnet workload install maui
-dotnet build KpiTracker/KpiTracker.csproj -f net8.0-android
-dotnet build KpiTracker/KpiTracker.csproj -t:Run -f net8.0-android   # запуск на емуляторі
+dotnet build KpiTracker/KpiTracker.csproj -f net10.0-android
+dotnet build KpiTracker/KpiTracker.csproj -t:Run -f net10.0-android   # запуск на емуляторі
 ```
 
-Або відкрийте `KpiTracker.sln` у Visual Studio 2022 (17.8+) / Rider і запустіть на Android Emulator.
+Або відкрийте папку у VS Code з розширеннями C# Dev Kit і .NET MAUI (чи `KpiTracker.sln` у Visual Studio 2026) і запустіть на Android Emulator.
 
 ## Журнал взаємодії з LLM
 
